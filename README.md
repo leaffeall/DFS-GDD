@@ -1,0 +1,1 @@
+# Decoupling_Forgery_Semantics_for-_Generalizable_Deepfake_Detection
