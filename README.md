@@ -1,1 +1,1 @@
-# Decoupling_Forgery_Semantics_for_Generalizable_Deepfake_Detection
+# Decoupling Forgery Semantics for Generalizable Deepfake Detection
