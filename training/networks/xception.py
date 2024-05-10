@@ -7,21 +7,14 @@ The code is mainly modified from GitHub link below:
 https://github.com/ondyari/FaceForensics/blob/master/classification/network/xception.py
 '''
 
-import os
-import argparse
 import logging
 
-import math
 
 import numpy as np
 import torch
-# import pretrainedmodels
 import torch.nn as nn
 import torch.nn.functional as F
 
-import torch.utils.model_zoo as model_zoo
-from torch.nn import init
-from typing import Union
 from utils.registry import BACKBONE
 
 logger = logging.getLogger(__name__)
@@ -353,51 +346,16 @@ class Xception(nn.Module):
         self.conv4s = SeparableConv2d(1536, 2048, 3, 1, 1)
         self.bn4s = nn.BatchNorm2d(2048)
 
-        # self.last_linear = nn.Linear(2048, self.num_classes)
-        # if dropout:
-        #     self.last_linear = nn.Sequential(
-        #         nn.Dropout(p=dropout),
-        #         nn.Linear(2048, self.num_classes)
-        #     )
-        #
-        # self.adjust_channel = nn.Sequential(
-        #     nn.Conv2d(2048, 512, 1, 1),
-        #     nn.BatchNorm2d(512),
-        #     nn.ReLU(inplace=True),
-        # )
 
 
-        # self.pag1 = PagFM(728, 364)
-        # self.pag2 = PagFM(728, 364)
-        # self.pag3 = PagFM(2048, 1024)
-        # self.get_high1=GaussianFilter(3, 1.0,in_channels=32)
-        # self.get_high2=GaussianFilter(3, 1.0,in_channels=64)
+
+        self.pag1 = PagFM(728, 364)
+        self.pag2 = PagFM(728, 364)
+        self.get_high1=GaussianFilter(3, 1.0,in_channels=32)
+        self.get_high2=GaussianFilter(3, 1.0,in_channels=64)
 
 
-           
-    # def fea_part1_0(self, x,y):
-    #     x = self.conv1(x)
-    #     x = self.bn1(x)
-    #     x = self.relu(x)
-    #
-    #     y = self.conv1s(y)
-    #     y = self.bn1s(y)
-    #     y = self.relus(y)
-    #
-    #     return x,y
-    #
-    # def fea_part1_1(self, x,y):
-    #
-    #     x = self.conv2(x)
-    #     x = self.bn2(x)
-    #     x = self.relu(x)
-    #
-    #     y = self.conv2s(y)
-    #     y = self.bn2s(y)
-    #     y = self.relus(y)
-    #
-    #     return x,y
-    
+
     def fea_part1(self, x,y):
         x = self.conv1(x)
         x = self.bn1(x)
@@ -407,6 +365,7 @@ class Xception(nn.Module):
         y = self.bn1s(y)
         y = self.relus(y)
 
+        y = y + self.get_high1(x)
 
         x = self.conv2(x)
         x = self.bn2(x)
@@ -416,10 +375,11 @@ class Xception(nn.Module):
         y = self.bn2s(y)
         y = self.relus(y)
 
+        y = y + self.get_high2(x)
 
 
         return x,y
-    
+
     def fea_part2(self, x,y):
         x = self.block1(x)
         x = self.block2(x)
@@ -429,6 +389,7 @@ class Xception(nn.Module):
         y = self.block2s(y)
         y = self.block3s(y)
 
+        x = x + self.pag1(x, y)
 
         return x,y
 
@@ -458,6 +419,8 @@ class Xception(nn.Module):
         y = self.block10s(y)
         y = self.block11s(y)
 
+        x = x + self.pag2(x, y)
+
 
         x = self.block12(x)
         y = self.block12s(y)
@@ -479,18 +442,14 @@ class Xception(nn.Module):
         y = self.bn4s(y)
 
         return x,y
-     
+
     def features(self, x,y):
         x,y = self.fea_part1(x,y)
         x,y = self.fea_part2(x,y)
         x,y = self.fea_part3(x,y)
         x,y = self.fea_part4(x,y)
-
         x,y = self.fea_part5(x,y)
-
         x = x + y
-
-        
         return x
 
     def classifier(self, features):
