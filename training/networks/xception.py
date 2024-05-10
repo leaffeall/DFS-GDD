@@ -27,35 +27,6 @@ class SeparableConv2d(nn.Module):
         return x
 
 
-class Partial_conv3(nn.Module):
-
-    def __init__(self, dim, n_div=4, forward='split_cat'):
-        super().__init__()
-        self.dim_conv3 = dim // n_div
-        self.dim_untouched = dim - self.dim_conv3
-        self.partial_conv3 = nn.Conv2d(self.dim_conv3, self.dim_conv3, 3, 1, 1, bias=False)
-
-        if forward == 'slicing':
-            self.forward = self.forward_slicing
-        elif forward == 'split_cat':
-            self.forward = self.forward_split_cat
-        else:
-            raise NotImplementedError
-
-    def forward_slicing(self,x):
-        # only for inference
-        x = x.clone()  # !!! Keep the original input intact for the residual connection later
-        x[:, :self.dim_conv3, :, :] = self.partial_conv3(x[:, :self.dim_conv3, :, :])
-
-        return x
-
-    def forward_split_cat(self, x):
-        # for training/inference
-        x1, x2 = torch.split(x, [self.dim_conv3, self.dim_untouched], dim=1)
-        x1 = self.partial_conv3(x1)
-        x = torch.cat((x1, x2), 1)
-
-        return x
 
 
 class Block(nn.Module):
@@ -113,116 +84,8 @@ class Block(nn.Module):
         x += skip
         return x
 
-class Block_part(nn.Module):
-    def __init__(self, in_filters, out_filters, reps, strides=1, start_with_relu=True, grow_first=True):
-        super(Block_part, self).__init__()
 
-        if out_filters != in_filters or strides != 1:
-            self.skip = nn.Conv2d(in_filters, out_filters,
-                                  1, stride=strides, bias=False)
-            self.skipbn = nn.BatchNorm2d(out_filters)
-        else:
-            self.skip = None
 
-        self.relu = nn.ReLU(inplace=True)
-        rep = []
-
-        filters = in_filters
-        if grow_first:   # whether the number of filters grows first
-            rep.append(self.relu)
-            rep.append(SeparableConv2d(in_filters, out_filters,
-                                       3, stride=1, padding=1, bias=False))
-            rep.append(nn.BatchNorm2d(out_filters))
-            filters = out_filters
-
-        for i in range(reps-1):
-            rep.append(self.relu)
-            rep.append(Partial_conv3(filters))
-            rep.append(nn.BatchNorm2d(filters))
-
-        if not grow_first:
-            rep.append(self.relu)
-            rep.append(SeparableConv2d(in_filters, out_filters,
-                                       3, stride=1, padding=1, bias=False))
-            rep.append(nn.BatchNorm2d(out_filters))
-
-        if not start_with_relu:
-            rep = rep[1:]
-        else:
-            rep[0] = nn.ReLU(inplace=False)
-
-        if strides != 1:
-            rep.append(nn.MaxPool2d(3, strides, 1))
-        self.rep = nn.Sequential(*rep)
-
-    def forward(self, inp):
-        x = self.rep(inp)
-
-        if self.skip is not None:
-            skip = self.skip(inp)
-            skip = self.skipbn(skip)
-        else:
-            skip = inp
-
-        x += skip
-        return x
-
-class Block_part1(nn.Module):
-    def __init__(self, in_filters, out_filters, reps, strides=1, start_with_relu=True, grow_first=True):
-        super(Block_part1, self).__init__()
-
-        if out_filters != in_filters or strides != 1:
-            self.skip = nn.Conv2d(in_filters, out_filters,
-                                  1, stride=strides, bias=False)
-            self.skipbn = nn.BatchNorm2d(out_filters)
-        else:
-            self.skip = None
-
-        self.relu = nn.ReLU(inplace=True)
-        rep = []
-
-        filters = in_filters
-        if grow_first:   # whether the number of filters grows first
-            rep.append(self.relu)
-            rep.append(Partial_conv3(filters))
-            rep.append(nn.BatchNorm2d(out_filters))
-            filters = out_filters
-
-        for i in range(reps-1):
-            rep.append(self.relu)
-            rep.append(Partial_conv3(filters))
-            rep.append(nn.BatchNorm2d(filters))
-
-        if not grow_first:
-            rep.append(self.relu)
-            rep.append(SeparableConv2d(in_filters, out_filters,
-                                       3, stride=1, padding=1, bias=False))
-            rep.append(nn.BatchNorm2d(out_filters))
-
-        if not start_with_relu:
-            rep = rep[1:]
-        else:
-            rep[0] = nn.ReLU(inplace=False)
-
-        if strides != 1:
-            rep.append(nn.MaxPool2d(3, strides, 1))
-        self.rep = nn.Sequential(*rep)
-
-    def forward(self, inp):
-        x = self.rep(inp)
-
-        if self.skip is not None:
-            skip = self.skip(inp)
-            skip = self.skipbn(skip)
-        else:
-            skip = inp
-
-        x += skip
-        return x
-
-def add_gaussian_noise(ins, mean=0, stddev=0.2):
-    noise = ins.data.new(ins.size()).normal_(mean, stddev)
-    return ins + noise
 
 
 @BACKBONE.register_module(module_name="xception")
