@@ -111,7 +111,7 @@ For model testing, we provide [`test_in.py`](training/test_in.py) for in-domain 
 
 ## 📖 Citation
 Please kindly consider citing our papers in your publications. 
-```bash
+```BibTeX
 @inproceedings{Wei2024dfs,
     title={Decoupling Forgery Semantics for Generalizable Deepfake Detection},
     author={Wei Ye, Xinan He, Feng Ding},
