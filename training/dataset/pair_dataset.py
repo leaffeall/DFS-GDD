@@ -45,17 +45,17 @@ class pairDataset(Dataset):
             fake_trans = self.transform(fake_img)
             fake_label = np.array(self.fake_image_list.iloc[idx, 1])
 
-            fake_uni_label = np.array(self.fake_image_list.iloc[idx, 7])
+            fake_spe_label = np.array(self.fake_image_list.iloc[idx, 2])
 
         if real_img_path != 'img_path':
             real_img = Image.open(real_img_path)
             real_trans = self.transform(real_img)
             real_label = np.array(self.real_image_list.iloc[real_idx, 1])
-            real_uni_label = np.array(self.real_image_list.iloc[real_idx, 1])
+            real_spe_label = np.array(self.real_image_list.iloc[real_idx, 1])
             # real_fair_label = np.array(self.real_image_list.iloc[real_idx, 2])
 
-        return {"fake": (fake_trans, fake_label, fake_uni_label),
-                "real": (real_trans, real_label, real_uni_label)}
+        return {"fake": (fake_trans, fake_label, fake_spe_label),
+                "real": (real_trans, real_label, real_spe_label)}
 
     def __len__(self):
         return len(self.fake_image_list)
@@ -74,34 +74,34 @@ class pairDataset(Dataset):
             and the mask tensor.
         """
         # Separate the image, label,  tensors for fake and real data
-        fake_images, fake_labels, fake_uni_labels = zip(
+        fake_images, fake_labels, fake_spe_labels = zip(
             *[data["fake"] for data in batch])
         # print(fake_labels)
         fake_labels = tuple(x.item() for x in fake_labels)
-        fake_uni_labels = tuple(x.item() for x in fake_uni_labels)
-        real_images, real_labels, real_uni_labels = zip(
+        fake_spe_labels = tuple(x.item() for x in fake_spe_labels)
+        real_images, real_labels, real_spe_labels = zip(
             *[data["real"] for data in batch])
         real_labels = tuple(x.item() for x in real_labels)
-        real_uni_labels = tuple(x.item() for x in real_uni_labels)
+        real_spe_labels = tuple(x.item() for x in real_spe_labels)
 
         # Stack the image, label, tensors for fake and real data
         fake_images = torch.stack(fake_images, dim=0)
         fake_labels = torch.LongTensor(fake_labels)
-        fake_uni_labels = torch.LongTensor(fake_uni_labels)
+        fake_spe_labels = torch.LongTensor(fake_spe_labels)
 
         real_images = torch.stack(real_images, dim=0)
         real_labels = torch.LongTensor(real_labels)
-        real_uni_labels = torch.LongTensor(real_uni_labels)
+        real_spe_labels = torch.LongTensor(real_spe_labels)
 
         # Combine the fake and real tensors and create a dictionary of the tensors
         images = torch.cat([real_images, fake_images], dim=0)
         labels = torch.cat([real_labels, fake_labels], dim=0)
-        uni_labels = torch.cat([real_uni_labels, fake_uni_labels], dim=0)
+        spe_labels = torch.cat([real_spe_labels, fake_spe_labels], dim=0)
 
 
         data_dict = {
             'image': images,
             'label': labels,
-            'label_uni': uni_labels
+            'label_spe': spe_labels
         }
         return data_dict

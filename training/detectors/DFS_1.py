@@ -47,24 +47,11 @@ class DFS_1(AbstractDetector):
         self.prob, self.label = [], []
         self.correct, self.total = 0, 0
 
-        # basic function
-        self.lr = nn.LeakyReLU(inplace=True)
-        self.do = nn.Dropout(0.2)
-        self.pool = nn.AdaptiveAvgPool2d(1)
 
-
-        self.fusion1 = self.build_backbone3()
+        self.fusion_stage1 = self.build_backbone3()
         self.get_high=GaussianFilter(3, 1.0,in_channels=3)
 
 
-        self.discriminator = nn.Sequential(
-            nn.Conv2d(self.encoder_feat_dim * 2, 512, 3, 2, 1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(512, 64, 3, 2, 1),
-            nn.ReLU(inplace=True),
-            Flatten(),
-            nn.Linear(256, 1)
-        )
         self.sigmoid = nn.Sigmoid()
 
         # head
@@ -72,12 +59,6 @@ class DFS_1(AbstractDetector):
             in_f=self.half_fingerprint_dim * 2,
             hidden_dim=self.encoder_feat_dim*2,
             out_f=self.num_classes
-        )
-
-        self.block_all = Conv2d1x1(
-            in_f=self.encoder_feat_dim,
-            hidden_dim=self.half_fingerprint_dim,
-            out_f=self.half_fingerprint_dim
         )
 
 
@@ -91,7 +72,7 @@ class DFS_1(AbstractDetector):
         backbone = backbone_class({'mode': 'adjust_channel',
                                    'num_classes': 2, 'inc': 3, 'dropout': False})
         state_dict = torch.load(
-            './xception-b5690688.pth')
+            '/home/user/local/yw/training/pretrained/xception-b5690688.pth')
         for name, weights in state_dict.items():
             if 'pointwise' in name:
                 state_dict[name] = weights.unsqueeze(-1).unsqueeze(-1)
@@ -99,7 +80,7 @@ class DFS_1(AbstractDetector):
         backbone.load_state_dict(state_dict, False)
 
         state_dict1 = torch.load(
-            './xception-b5690688.pth')
+            '/home/user/local/yw/training/pretrained/xception-b5690688.pth')
         for name, weights in state_dict1.items():
             if 'pointwise' in name:
                 state_dict1[name] = weights.unsqueeze(-1).unsqueeze(-1)
@@ -115,7 +96,7 @@ class DFS_1(AbstractDetector):
 
         backbone = backbone_class({'mode': 'adjust_channel',
                                    'num_classes': 2, 'inc': 3, 'dropout': False})
-        weights_part2 = torch.load("./SwiftFormer_L1.pth")
+        weights_part2 = torch.load("/home/user/local/yw/training/pretrained/SwiftFormer_L1.pth")
         model_dict = backbone.state_dict()
         pretrained_dict2 = {k: v for k, v in weights_part2.items() if k in model_dict}
         model_dict.update(pretrained_dict2)
@@ -292,13 +273,13 @@ class DFS_1(AbstractDetector):
         c2, c1 = content_features.chunk(2, dim=0)
 
 
-        self_reconstruction_image_1 = self.fusion(c1, f1)
+        self_reconstruction_image_1 = self.fusion_stage1(c1, f1)
 
-        self_reconstruction_image_2 = self.fusion(c2, f2)
+        self_reconstruction_image_2 = self.fusion_stage1(c2, f2)
 
-        reconstruction_image_1 = self.fusion(c2, f1)
+        reconstruction_image_1 = self.fusion_stage1(c2, f1)
 
-        reconstruction_image_2 = self.fusion(c1, f2)
+        reconstruction_image_2 = self.fusion_stage1(c1, f2)
 
 
         out_all, all_feat = self.head_all(f_all)

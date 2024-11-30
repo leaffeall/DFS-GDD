@@ -13,7 +13,7 @@ def classification_metrics(label, prediction):
     return auc, acc
 
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_size", type=int, default=299)
@@ -34,24 +34,22 @@ if __name__ == '__main__':
 
     from transform import DFS_default_data_transforms as data_transforms
 
-    interattributes = opt.inter_attribute.split('-')
-    singleattributes = opt.single_attribute.split('-')
-
 
     test_data_names = ['ff++', 'celebdf', 'dfd', 'dfdc']
     test_data_paths = [
-        './testff++1.csv',
-        './testcelebdf1.csv',
-        './testdfd1.csv',
-        './testdfdc1.csv'
+        '/home/user/local/yw/training/testff++.csv',
+        '/home/user/local/yw/training/testcelebdf.csv',
+        '/home/user/local/yw/training/testdfd.csv',
+        '/home/user/local/yw/training/testdfdc.csv'
     ]
 
-    for i in range(0,20):
+    for i in range(0,1):
         model = model_class()
         if cuda:
-            model.cuda()
+            device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+            model.to(device)
 
-        checkpoints_path = f'./DFS.pth'
+        checkpoints_path = f'/home/user/local/yw/DFS_2_8.pth'
         ckpt = torch.load(checkpoints_path)
         model.load_state_dict(ckpt, strict=True)
         print(f'Loading model from: {checkpoints_path}')

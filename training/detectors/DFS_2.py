@@ -56,18 +56,11 @@ class DFS_2(AbstractDetector):
         self.do = nn.Dropout(0.2)
         self.pool = nn.AdaptiveAvgPool2d(1)
 
-        self.fusion2 = fusion()
+        self.fusion_stage2 = fusion()
         self.get_high=GaussianFilter(3, 1.0,in_channels=3)
 
 
-        self.discriminator = nn.Sequential(
-            nn.Conv2d(self.encoder_feat_dim * 2, 512, 3, 2, 1),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(512, 64, 3, 2, 1),
-            nn.ReLU(inplace=True),
-            Flatten(),
-            nn.Linear(256, 1)
-        )
+
         self.sigmoid = nn.Sigmoid()
 
         uni_task_number = 6
@@ -108,7 +101,7 @@ class DFS_2(AbstractDetector):
         backbone = backbone_class({'mode': 'adjust_channel',
                                    'num_classes': 2, 'inc': 3, 'dropout': False})
         state_dict = torch.load(
-            './xception-b5690688.pth')
+            '/home/user/local/yw/training/pretrained/xception-b5690688.pth')
         for name, weights in state_dict.items():
             if 'pointwise' in name:
                 state_dict[name] = weights.unsqueeze(-1).unsqueeze(-1)
@@ -116,7 +109,7 @@ class DFS_2(AbstractDetector):
         backbone.load_state_dict(state_dict, False)
 
         state_dict1 = torch.load(
-            './xception-b5690688.pth')
+            '/home/user/local/yw/training/pretrained/xception-b5690688.pth')
         for name, weights in state_dict1.items():
             if 'pointwise' in name:
                 state_dict1[name] = weights.unsqueeze(-1).unsqueeze(-1)
@@ -134,7 +127,7 @@ class DFS_2(AbstractDetector):
 
         backbone = backbone_class({'mode': 'adjust_channel',
                                    'num_classes': 2, 'inc': 3, 'dropout': False})
-        weights_part2 = torch.load("SwiftFormer_L1")
+        weights_part2 = torch.load("/home/user/local/yw/training/pretrained/SwiftFormer_L1.pth")
         model_dict = backbone.state_dict()
         pretrained_dict2 = {k: v for k, v in weights_part2.items() if k in model_dict}
         model_dict.update(pretrained_dict2)
@@ -208,11 +201,11 @@ class DFS_2(AbstractDetector):
             = pred_dict['recontruction_imgs']
         # get label
         label = data_dict['label']
-        label_uni = data_dict['label_uni']
+        label_uni = data_dict['label_spe']
 
         # get pred
         pred = pred_dict['cls']
-        pred_uni = pred_dict['cls_uni']
+        pred_uni = pred_dict['cls_spe']
 
 
         # 1. classification loss for common features
@@ -236,7 +229,7 @@ class DFS_2(AbstractDetector):
 
         # 4. constrative loss
         common_features = pred_dict['feat']
-        unique_features = pred_dict['feat_uni']
+        unique_features = pred_dict['feat_spe']
         loss_con = self.loss_func['con'](
             common_features, unique_features, label_uni)
 
@@ -272,8 +265,8 @@ class DFS_2(AbstractDetector):
         # get pred and label
         label = data_dict['label']
         pred = pred_dict['cls']
-        label_uni = data_dict['label_uni']
-        pred_uni = pred_dict['cls_uni']
+        label_uni = data_dict['label_spe']
+        pred_uni = pred_dict['cls_spe']
 
         # compute metrics for batch data
         auc, eer, acc, ap = calculate_metrics_for_train(
@@ -312,7 +305,7 @@ class DFS_2(AbstractDetector):
 
         if inference:
             # inference only consider share loss
-            out_sha, sha_feat = self.head_sha1(f_share)
+            out_sha, sha_feat = self.head_sha(f_share)
             prob_sha = torch.softmax(out_sha, dim=1)[:, 1]
             self.prob.append(
                 prob_sha
@@ -346,13 +339,13 @@ class DFS_2(AbstractDetector):
         c22, c11 = f_uni.chunk(2, dim=0)
 
 
-        self_reconstruction_image_1 = self.fusion1(c1, c11)#f
+        self_reconstruction_image_1 = self.fusion_stage2(c1, c11)#f
 
-        self_reconstruction_image_2 = self.fusion1(c2, c22)#r
+        self_reconstruction_image_2 = self.fusion_stage2(c2, c22)#r
 
-        reconstruction_image_1 = self.fusion1(c2, c11)#r
+        reconstruction_image_1 = self.fusion_stage2(c2, c11)#r
 
-        reconstruction_image_2 = self.fusion1(c1, c22)#f
+        reconstruction_image_2 = self.fusion_stage2(c1, c22)#f
 
 
 
@@ -366,8 +359,8 @@ class DFS_2(AbstractDetector):
         pred_dict = {
             'cls': out_sha,
             'feat': sha_feat,
-            'cls_uni': out_uni,
-            'feat_uni': uni_feat,
+            'cls_spe': out_uni,
+            'feat_spe': uni_feat,
             'recontruction_imgs': (
                 reconstruction_image_1,
                 reconstruction_image_2,

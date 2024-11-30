@@ -14,7 +14,7 @@ def classification_metrics(label, prediction):
     return auc, acc
 
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--input_size", type=int, default=299)
@@ -35,25 +35,22 @@ if __name__ == '__main__':
 
     from transform import DFS_default_data_transforms as data_transforms
 
-    interattributes = opt.inter_attribute.split('-')
-    singleattributes = opt.single_attribute.split('-')
-
     test_data_names = ['DF', 'F2F', 'FST', 'FS','NT']
     test_data_paths = [
-        './Deepfakes.csv',
-        './Face2Face.csv',
-        './FaceShifter.csv',
-        './FaceSwap.csv',
-        './NeuralTextures.csv'
+        '/home/user/local/yw/training/Deepfakes.csv',
+        '/home/user/local/yw/training/Face2Face.csv',
+        '/home/user/local/yw/training/FaceShifter.csv',
+        '/home/user/local/yw/training/FaceSwap.csv',
+        '/home/user/local/yw/training/NeuralTextures.csv'
     ]
 
     for i in range(1):
         model = model_class()
         if cuda:
-            device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+            device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
             model.to(device)
 
-        checkpoints_path = f'./DFS.pth'
+        checkpoints_path = f'/home/user/local/yw/DFS_2_8.pth'
         ckpt = torch.load(checkpoints_path)
         model.load_state_dict(ckpt, strict=True)
         print(f'Loading model from: {checkpoints_path}')
@@ -65,7 +62,7 @@ if __name__ == '__main__':
                 test_data_path, data_transforms['test'], test_set='ff++')
 
             test_dataloader = DataLoader(
-                test_dataset, batch_size=opt.batch_size, shuffle=False)
+                test_dataset, batch_size=opt.batch_size, shuffle=True)
 
             print("Testing on:", test_data_name)
             print('-' * 10)

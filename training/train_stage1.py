@@ -22,14 +22,14 @@ parser.add_argument('--lr', type=float, default=0.0005,
                     help="learning rate for training")
 parser.add_argument('--batchsize', type=int, default=16, help="batch size")
 parser.add_argument('--seed', type=int, default=5)
-parser.add_argument('--gpu', type=str, default='0')
+parser.add_argument('--gpu', type=str, default='1')
 parser.add_argument('--dataname', type=str, default='ff++',
                     help='ff++, celebdf, dfd, dfdc')
 parser.add_argument('--use-cpu', action='store_true')
 parser.add_argument('--fake_datapath', type=str,
-                    default='./fake.csv')
+                    default='./fake')
 parser.add_argument('--real_datapath', type=str,
-                    default='./real.csv')
+                    default='./real')
 parser.add_argument("--continue_train", action='store_true')
 parser.add_argument("--checkpoints", type=str, default='',
                     help="continue train model path")
@@ -53,14 +53,14 @@ if args.model == 'DFS':
 
 
 
-face_dataset = {x: pairDataset(args.fake_datapath+'fake'+'{}.csv'.format(
-    x), args.real_datapath+'real'+'{}.csv'.format(
+face_dataset = {x: pairDataset(args.fake_datapath+'{}.csv'.format(
+    x), args.real_datapath+'{}.csv'.format(
     x), data_transforms[x]) for x in ['train', 'val']}
 
 dataloaders = {x: torch.utils.data.DataLoader(
     dataset=face_dataset[x], batch_size=args.batchsize, shuffle=True, num_workers=8, collate_fn=face_dataset[x].collate_fn) for x in ['train', 'val']}
 dataset_sizes = {x: len(face_dataset[x]) for x in ['train', 'val']}
-device = torch.device('cuda:0')
+device = torch.device('cuda:1')
 
 # prepare the model (detector)
 model_class = DETECTOR['DFS_1']
@@ -98,8 +98,8 @@ def train(model,  optimizer, scheduler, num_epochs, start_epoch):
                 losses.backward()
                 optimizer.step()
                 model.get_high.reset_center()
-                model.encoder_hf.get_high1.reset_center()
-                model.encoder_hf.get_high2.reset_center()
+                model.encoder_f.get_high1.reset_center()
+                model.encoder_f.get_high2.reset_center()
 
             if idx % 50 == 0:
                 # compute training metric for each batch data
@@ -118,7 +118,7 @@ def train(model,  optimizer, scheduler, num_epochs, start_epoch):
         # evaluation
         # if (epoch+1) % 5 == 0:
         if (epoch+1) % 1 == 0:
-            savepath = './checkpoints_gauss_DFS/'+args.model+'/' + \
+            savepath = './checkpoints_gauss_DFS1/'+args.model+'/' + \
                     args.dataname+'_'+'/lr'+str(args.lr)
 
 
@@ -200,7 +200,7 @@ def main():
     if args.use_cpu:
         use_gpu = False
 
-    sys.stdout = Logger(osp.join('./checkpoints_gauss_DFS/'+args.model+'/' + \
+    sys.stdout = Logger(osp.join('./checkpoints_gauss_DFS1/'+args.model+'/' + \
                     args.dataname+'_'+'/lr'+str(args.lr)+'/log_training.txt'))
 
     if use_gpu:

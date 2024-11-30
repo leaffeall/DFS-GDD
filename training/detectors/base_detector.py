@@ -35,12 +35,6 @@ class AbstractDetector(nn.Module, metaclass=abc.ABCMeta):
         """
         pass
 
-    @abc.abstractmethod
-    def classifier(self, features: torch.tensor) -> torch.tensor:
-        """
-        Classifies the features into classes.
-        """
-        pass
 
     @abc.abstractmethod
     def build_backbone(self, config):

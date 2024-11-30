@@ -3,9 +3,9 @@
 Wei Ye, Xinan He, and Feng Ding
 _________________
 
-This repository is the official implementation of our paper "Decoupling Forgery Semantics for Generalizable Deepfake Detection", which has been accepted by **BMVC 2024**. 
+This repository is the official implementation of our paper "Decoupling Forgery Semantics for Generalizable Deepfake Detection", which has been accepted by **BMVC 2024**🎉🎉. 
 
-## 1. Installation
+## 💡 Installation
 You can run the following script to configure the necessary environment:
 
 ```
@@ -15,7 +15,7 @@ conda activate DFSGDD
 pip install -r requirements.txt
 ```
 
-## 2. Dataset Preparation
+## 🎭 Dataset Preparation
 
 We share the FF++, Celeb-DF, DFD, DFDC with demographic annotations from [paper](https://arxiv.org/pdf/2208.05845.pdf),  which be downloaded through this [link](https://purdue0-my.sharepoint.com/:f:/g/personal/lin1785_purdue_edu/EtMK0nfxMldAikDxesIo6ckBVHMME1iIV1id_ZsbM9hsqg?e=WayYoy). 
 
@@ -53,10 +53,10 @@ Or you can download these datasets from their official website and process them 
 				/path/to/cropped_images/imgxx.png, 1(fake)/0(real)
 				...
 
-## 3. Load Pretrained Weights
-Before running the training code, make sure you load the pre-trained weights. You can download the *Xception* model pre-trained on ImageNet (through this [link](http://data.lip6.fr/cadene/pretrainedmodels/xception-b5690688.pth)), and select a pre-trained *SwiftFormer* model from this [repository](https://github.com/Amshaker/SwiftFormer). Alternatively, you can use your own pre-trained *Xception* and *SwiftFormer* models.
+## 💫 Load Pretrained Weights
+Before running the training code, please ensure that you have loaded the pre-trained weights. You can directly use the pre-trained models of [Xception](https://www.dropbox.com/scl/fi/mr3b2fksm2al1a8sjyf9t/xception-b5690688.pth?rlkey=6glri2bfj6djfdbmdf52g6ikq&st=om3vz7ru&dl=0) and [SwiftFormer_L1](https://www.dropbox.com/scl/fi/tezc62c3vdg44i6q79f2a/SwiftFormer_L1.pth?rlkey=1qkd695lbg4q18hxo3nsnzy6w&st=nstk1z2n&dl=0) provided by us, or you can download the *Xception* model pre-trained on ImageNet (through this [link](http://data.lip6.fr/cadene/pretrainedmodels/xception-b5690688.pth)) and select a pre-trained *SwiftFormer* model from this [repository](https://github.com/Amshaker/SwiftFormer). Alternatively, you can use your own pre-trained *Xception* and *SwiftFormer* models.
 
-## 4. Train
+## 🔥 Train
 To run the training code, you should first go to the [`./training/`](./training/) folder. The training process is divided into two stages. You should start by training the first stage by running [`train_stage1.py`](training/train_stage1.py):
 
 ```
@@ -88,7 +88,7 @@ You can adjust the parameters in [`train_stage1.py`](training/train_stage1.py) o
 
 `--model`: detector name: DFS.
 
-## 5. Test
+## 🤩 Test
 For model testing, we provide [`test_in.py`](training/test_in.py) for in-domain testing and [`test_cross.py`](training/test_cross.py) for cross-domain testing to evaluate our model.
 
 `--test_path`: /path/to/test.csv 
@@ -103,18 +103,20 @@ For model testing, we provide [`test_in.py`](training/test_in.py) for in-domain 
 
 `--batch_size`: testing batch size: default is 32.
 
-## 📦 Provided Backbones
-|                  | File name                                         | Paper                                                                                                                                                                                                                                                                                                                                                         |
-|------------------|---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Xception          | [xception.py](./training/networks/xception.py)    | [Xception: Deep learning with depthwise separable convolutions](https://openaccess.thecvf.com/content_cvpr_2017/html/Chollet_Xception_Deep_Learning_CVPR_2017_paper.html) |
-| SwiftFormer          | [swiftformer.py](./training/networks/swiftformer.py) | [SwiftFormer: Efficient Additive Attention for Transformer-based Real-time Mobile Vision Applications](https://openaccess.thecvf.com/content/ICCV2023/papers/Shaker_SwiftFormer_Efficient_Additive_Attention_for_Transformer-based_Real-time_Mobile_Vision_Applications_ICCV_2023_paper.pdf) |
+## 📦 Provided Models
+|                    | File name                                          |
+|--------------------|----------------------------------------------------|
+| Pre_Xception       | [xception-b5690688.pth](https://www.dropbox.com/scl/fi/mr3b2fksm2al1a8sjyf9t/xception-b5690688.pth?rlkey=6glri2bfj6djfdbmdf52g6ikq&st=om3vz7ru&dl=0) |
+| Pre_SwiftFormer_L1 | [SwiftFormer_L1.pth](https://www.dropbox.com/scl/fi/tezc62c3vdg44i6q79f2a/SwiftFormer_L1.pth?rlkey=1qkd695lbg4q18hxo3nsnzy6w&st=nstk1z2n&dl=0) |
+| Our_Stage1         | [DFS_1_10.pth](https://www.dropbox.com/scl/fi/rzl2h3ljyjjaptn24bz0r/DFS_1_10.pth?rlkey=2dnn285zlwbyrrimlgkox3scu&st=cz6u44hd&dl=0) |
+| Our_Stage2         | [DFS_2_8.pth](https://www.dropbox.com/scl/fi/w9gai5wgvlowygdlqk2we/DFS_2_8.pth?rlkey=7iqfv1y9d30cfst2mdv2wqvym&st=2acf0c3e&dl=0)   | 
 
 ## 📖 Citation
 Please kindly consider citing our papers in your publications. 
 ```BibTeX
 @inproceedings{Wei2024dfs,
     title={Decoupling Forgery Semantics for Generalizable Deepfake Detection},
-    author={Wei Ye, Xinan He, Feng Ding},
+    author={Wei Ye and Xinan He and Feng Ding},
     booktitle={British Machine Vision Conference (BMVC)},
     year={2024},
 }
