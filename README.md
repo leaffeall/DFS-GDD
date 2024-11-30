@@ -5,6 +5,14 @@ _________________
 
 This repository is the official implementation of our paper "Decoupling Forgery Semantics for Generalizable Deepfake Detection", which has been accepted by **BMVC 2024**🎉🎉. 
 
+## 📦 Provided Models
+|                    | File name                                          |
+|--------------------|----------------------------------------------------|
+| Pre_Xception       | [xception-b5690688.pth](https://www.dropbox.com/scl/fi/mr3b2fksm2al1a8sjyf9t/xception-b5690688.pth?rlkey=6glri2bfj6djfdbmdf52g6ikq&st=om3vz7ru&dl=0) |
+| Pre_SwiftFormer_L1 | [SwiftFormer_L1.pth](https://www.dropbox.com/scl/fi/tezc62c3vdg44i6q79f2a/SwiftFormer_L1.pth?rlkey=1qkd695lbg4q18hxo3nsnzy6w&st=nstk1z2n&dl=0) |
+| Our_Stage1         | [DFS_1_10.pth](https://www.dropbox.com/scl/fi/rzl2h3ljyjjaptn24bz0r/DFS_1_10.pth?rlkey=2dnn285zlwbyrrimlgkox3scu&st=cz6u44hd&dl=0) |
+| Our_Stage2         | [DFS_2_8.pth](https://www.dropbox.com/scl/fi/w9gai5wgvlowygdlqk2we/DFS_2_8.pth?rlkey=7iqfv1y9d30cfst2mdv2wqvym&st=2acf0c3e&dl=0)   | 
+
 ## 💡 Installation
 You can run the following script to configure the necessary environment:
 
@@ -105,14 +113,6 @@ For model testing, we provide [`test_in.py`](training/test_in.py) for in-domain 
 
 ## ❗Note
 Please note that in files [`train_stage1.py`](training/train_stage1.py), [`train_stage2.py`](training/train_stage2.py), [`DFS_1.py`](training/detectors/DFS_1.py), [`DFS_2.py`](training/detectors/DFS_2.py), [`test_in.py`](training/test_in.py) and [`test_cross.py`](training/test_cross.py), you will need to replace the paths in the code with your own file paths.
-
-## 📦 Provided Models
-|                    | File name                                          |
-|--------------------|----------------------------------------------------|
-| Pre_Xception       | [xception-b5690688.pth](https://www.dropbox.com/scl/fi/mr3b2fksm2al1a8sjyf9t/xception-b5690688.pth?rlkey=6glri2bfj6djfdbmdf52g6ikq&st=om3vz7ru&dl=0) |
-| Pre_SwiftFormer_L1 | [SwiftFormer_L1.pth](https://www.dropbox.com/scl/fi/tezc62c3vdg44i6q79f2a/SwiftFormer_L1.pth?rlkey=1qkd695lbg4q18hxo3nsnzy6w&st=nstk1z2n&dl=0) |
-| Our_Stage1         | [DFS_1_10.pth](https://www.dropbox.com/scl/fi/rzl2h3ljyjjaptn24bz0r/DFS_1_10.pth?rlkey=2dnn285zlwbyrrimlgkox3scu&st=cz6u44hd&dl=0) |
-| Our_Stage2         | [DFS_2_8.pth](https://www.dropbox.com/scl/fi/w9gai5wgvlowygdlqk2we/DFS_2_8.pth?rlkey=7iqfv1y9d30cfst2mdv2wqvym&st=2acf0c3e&dl=0)   | 
 
 ## 📖 Citation
 Please kindly consider citing our papers in your publications. 
