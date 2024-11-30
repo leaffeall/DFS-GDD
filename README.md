@@ -103,6 +103,9 @@ For model testing, we provide [`test_in.py`](training/test_in.py) for in-domain 
 
 `--batch_size`: testing batch size: default is 32.
 
+## ❗Note
+Please note that in files [`train_stage1.py`](training/train_stage1.py), [`train_stage2.py`](training/train_stage2.py), [`DFS_1.py`](training/detectors/DFS_1.py), [`DFS_2.py`](training/detectors/DFS_2.py), [`test_in.py`](training/test_in.py) and [`test_cross.py`](training/test_cross.py), you will need to replace the paths in the code with your own file paths.
+
 ## 📦 Provided Models
 |                    | File name                                          |
 |--------------------|----------------------------------------------------|
